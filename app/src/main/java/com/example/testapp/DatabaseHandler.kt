@@ -1,30 +1,25 @@
 package com.example.testapp
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 
-val DATABASE_NAME = "DB"
-val TABLE_NAME = "Info"
-val COL_NAME = "name"
-val COL_AGE = "age"
-val COL_GENDER = "gender"
-val COL_ID = "id"
 
-class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
+
+class DatabaseHandler(context: Context, name:String?,  factory: SQLiteDatabase.CursorFactory?, version: Int) : SQLiteOpenHelper(context, DATABASE_NAME, factory, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
       val createTable = "CREATE TABLE " + TABLE_NAME + " (" +
-              COL_ID + "INTEGER PRIMARY KEY AUTOINCREMENT," +
-              COL_NAME + "VARCHAR(256)," +
-        COL_AGE + "INTEGER, " +
-        COL_GENDER + "VARCHAR(256))";
+              COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+              COL_NAME + " TEXT," +
+            COL_AGE + " INTEGER," +
+            COL_GENDER + " TEXT)";
 
         db?.execSQL(createTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     fun insertData(info : Info) {
@@ -35,5 +30,33 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         cv.put(COL_GENDER, info.gender)
         db.insert(TABLE_NAME, null, cv)
         db.close()
+    }
+
+    fun getInfo(): Info? {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
+        var info: Info? = null
+
+        if (cursor.moveToLast()) {
+            cursor.moveToLast()
+
+            val name = cursor.getString(1)
+            val age  = Integer.parseInt(cursor.getString(2))
+            val gender = cursor.getString(3)
+            info = Info(name, age, gender)
+            cursor.close()
+        }
+
+        db.close()
+        return info
+    }
+
+    companion object {
+        val DATABASE_NAME = "DB"
+        val TABLE_NAME = "Info"
+        val COL_NAME = "name"
+        val COL_AGE = "age"
+        val COL_GENDER = "gender"
+        val COL_ID = "id"
     }
 }

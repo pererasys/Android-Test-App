@@ -38,9 +38,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:padding="10dp"
-            android:text="GO">
+            android:text="STORE DATA"
+            android:onClick="storeData">
 
         </Button>
+
     </LinearLayout>
 
 </LinearLayout>
